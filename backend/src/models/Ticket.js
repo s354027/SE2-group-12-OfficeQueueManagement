@@ -1,4 +1,4 @@
-import TicketStatus from "../constants/TicketStatus";
+import TicketStatus from "../constants/TicketStatus.js";
 
 class Ticket {
     code;
@@ -10,7 +10,7 @@ class Ticket {
     constructor(code, serviceId, status, createdAt, counterId) {
         this.code = code;
         this.serviceId = serviceId;
-        this.status = "WAITING";
+        this.status = TicketStatus.WAITING;
         this.createdAt = new Date(); // used for ordering, stats and debugging
         this.counterId = null; // you don't know a priori 
     }

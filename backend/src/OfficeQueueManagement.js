@@ -1,3 +1,5 @@
+import Ticket from "./models/Ticket.js";
+
 // this is the central unit that manages the office
 class OfficeQueueManagement {
     services;
@@ -24,6 +26,32 @@ class OfficeQueueManagement {
     generateNextTicketCode() {
         this.lastTicketCode += 1;
         return this.lastTicketCode;
+    }
+
+    /**
+    * Select a service type and issue a new ticket for it.
+    * The ticket is appended to the queue associated with the service.
+    * @param {string} serviceId - The id of the requested service.
+    * @returns {Ticket} The newly created ticket, holding the wait list code.
+    */
+    selectService(serviceId) {
+        const service = this.services.get(serviceId);
+        if (!service) {
+            throw new Error(`Service ${serviceId} does not exist`);
+        }
+
+        const queue = this.queues.get(serviceId);
+        if (!queue) {
+            throw new Error(`No queue configured for service ${serviceId}`);
+        }
+
+        const code = this.generateNextTicketCode();
+        const ticket = new Ticket(code, serviceId);
+
+        queue.enqueue(ticket);
+        this.tickets.set(code, ticket);
+
+        return ticket;
     }
 }
 
