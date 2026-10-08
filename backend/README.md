@@ -71,3 +71,54 @@ Current roles:
 
 ### Constants
 `TicketStatus` and `UserRole` define the allowed fixed values used by the models.
+
+
+## Backend API
+ 
+#### `POST /api/tickets`
+**Description:** This endpoint handles the customer's request and issuance of a new ticket.   
+**Request Body:** 
+```json
+{
+  "serviceId": 1
+}
+```
+**Response:** `201 Created`, `400  Bad Request` 
+**Response Body:** `code, serviceId, status, createdAt`   
+**Response Body Example:**  
+```json
+{
+  "code": 1,
+  "serviceId": 1,
+  "status": "WAITING",
+  "createdAt": "2026-10-08T14:50:00.000Z"
+}
+```
+
+
+#### `POST /api/counters/:counterId/next-customer`
+**Description:** The officer calls the next client to be served at their counter.  
+**Request Body:** `None`    
+**Response:** `200 OK`, `400  Bad Request`  
+**Response Body:** `message, ticket`  
+**Response Body Example - when queues are not empty:**  
+```json
+{
+  "message": "Next customer called successfully",
+  "ticket": {
+    "code": 1,
+    "serviceId": 1,
+    "status": "SERVED",
+    "counterId": 1,
+    "servedAt": "2026-10-08T14:50:00.000Z"
+  }
+}
+```
+
+**Response Body Example - when all managed queues are empty:**
+```json
+{
+  "message": "No customers waiting for this counter",
+  "ticket": null
+}
+´´´
