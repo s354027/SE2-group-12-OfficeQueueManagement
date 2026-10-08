@@ -10,6 +10,7 @@ It keeps references to all core entities through `Map`s:
 - counters
 - tickets
 - users
+- lastTicketCode
 
 It will be responsible for coordinating operations involving multiple models, such as ticket creation, next-ticket selection, queue reset, waiting-time calculation and statistics.
 
