@@ -11,7 +11,7 @@ export const issueTicket = (officeQueueManagement) => (req, res) => {
     }
 
     // Generate and queue the new ticket
-    const ticket = officeQueueManagement.issueTicket(serviceId);
+  const ticket = officeQueueManagement.selectService(serviceId);
 
     return res.status(201).json(ticket.getInfo());
   } catch (error) {
