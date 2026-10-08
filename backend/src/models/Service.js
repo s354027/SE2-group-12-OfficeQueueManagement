@@ -9,7 +9,7 @@ class Service {
         }
         this.id = id;
         this.tagName = tagName;
-        this.estimatedServiceTimeMinutes; 
+        this.estimatedServiceTimeMinutes = estimatedServiceTimeMinutes; 
     }
 
     setAverageServiceTime(minutes) {
