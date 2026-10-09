@@ -2,6 +2,30 @@
  * Controller for managing counter operations.
  */
 
+export const getCounter = (officeQueueManagement) => (req, res) => {
+  try {
+    const { counterId } = req.params;
+    const counter = officeQueueManagement.counters.get(counterId);
+
+    if (!counter) {
+      return res.status(404).json({ error: `Counter with ID ${counterId} not found.` });
+    }
+
+    const services = [...counter.serviceIds]
+      .map((serviceId) => officeQueueManagement.services.get(serviceId))
+      .filter(Boolean)
+      .map((service) => service.getInfo());
+
+    return res.status(200).json({
+      id: counter.id,
+      number: counter.number,
+      services
+    });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
 export const callNextCustomer = (officeQueueManagement) => (req, res) => {
   try {
     const { counterId } = req.params;
