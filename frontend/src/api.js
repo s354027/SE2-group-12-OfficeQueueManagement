@@ -28,3 +28,29 @@ export async function createTicket(serviceId) {
   }
   return body;
 }
+
+// GET /api/counters/:counterId -> { id, number, services }
+export async function getCounter(counterId) {
+  const backendCounterId = /^\d+$/.test(counterId) ? `C${counterId}` : counterId;
+  const res = await fetch(`/api/counters/${backendCounterId}`);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(body.error || `Request failed (${res.status})`);
+  }
+  return body;
+}
+
+// POST /api/counters/:counterId/next-customer  { counterId }  ->  200 { ticket, service }
+// Errors come back as 400 { error }.
+export async function callNextCustomer(counterId) {
+  const backendCounterId = /^\d+$/.test(counterId) ? `C${counterId}` : counterId;
+  const res = await fetch(`/api/counters/${backendCounterId}/next-customer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(body.error || `Request failed (${res.status})`);
+  }
+  return body;
+}
