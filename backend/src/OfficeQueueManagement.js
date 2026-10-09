@@ -113,9 +113,6 @@ class OfficeQueueManagement {
         if (ticket) {
             // Mark the ticket as called and set counterId
             ticket.markAsCalled(counterId);
-
-            // Mark the ticket as served
-            ticket.markAsServed();
     
             // Update the counter status by setting the current ticket code
             counter.assignTicket(ticket.code);
