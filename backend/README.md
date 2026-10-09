@@ -55,6 +55,18 @@ Stores:
 
 It does not own queues directly; it references supported services through their IDs.
 
+### Current Counter Configuration
+
+Counters are currently configured statically in `src/index.js`:
+
+| Counter ID | Number | Supported services |
+| --- | ---: | --- |
+| `C1` | 1 | `S1` Shipping, `S3` Info |
+| `C2` | 2 | `S1` Shipping, `S2` Accounts, `S3` Info |
+
+The counter configuration is read through `GET /api/counters/:counterId`. A dynamic
+configuration interface is not implemented yet.
+
 ### User
 Represents an authenticated internal user.
 
@@ -80,7 +92,7 @@ Current roles:
 **Request Body:** 
 ```json
 {
-  "serviceId": 1
+  "serviceId": "S1"
 }
 ```
 **Response:** `201 Created`, `400  Bad Request` 
@@ -89,12 +101,30 @@ Current roles:
 ```json
 {
   "code": 1,
-  "serviceId": 1,
+  "serviceId": "S1",
   "status": "WAITING",
   "createdAt": "2026-10-08T14:50:00.000Z"
 }
 ```
 
+
+#### `GET /api/counters/:counterId`
+**Description:** Returns the counter details and the services it can handle.  
+**Response:** `200 OK`, `404 Not Found`  
+**Response Body Example:**
+```json
+{
+  "id": "C1",
+  "number": 1,
+  "services": [
+    {
+      "id": "S1",
+      "tagName": "Shipping",
+      "estimatedServiceTimeMinutes": 5
+    }
+  ]
+}
+```
 
 #### `POST /api/counters/:counterId/next-customer`
 **Description:** The officer calls the next client to be served at their counter.  
@@ -107,9 +137,9 @@ Current roles:
   "message": "Next customer called successfully",
   "ticket": {
     "code": 1,
-    "serviceId": 1,
+    "serviceId": "S1",
     "status": "SERVED",
-    "counterId": 1,
+    "counterId": "C1",
     "servedAt": "2026-10-08T14:50:00.000Z"
   }
 }
