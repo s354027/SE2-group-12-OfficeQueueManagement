@@ -44,6 +44,37 @@ h1 { font-size: 3rem; margin: 0; }
   cursor: pointer;
 }
 .error { color: #b91c1c; font-size: 1.3rem; margin: 0; }
+.counter-screen { gap: 24px; }
+.counter-screen h1 { color: #0f172a; }
+.counter-services { margin: -12px 0 0; color: #475569; font-size: 1.2rem; }
+.counter-error { margin: -12px 0 0; color: #b91c1c; font-size: 1.1rem; }
+.counter-panel {
+  width: min(600px, 100%);
+  padding: 32px;
+  background: #fff;
+  border: 3px solid #bfdbfe;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgb(15 23 42 / 8%);
+}
+.counter-panel h2 { margin: 0 0 20px; font-size: 1.4rem; color: #475569; }
+.counter-ticket { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 700; color: #2563eb; }
+.counter-service { margin-top: 8px; font-size: 1.2rem; font-weight: 400; color: #475569; }
+.counter-empty { margin: 0; font-size: 1.3rem; color: #64748b; }
+.counter-button {
+  width: min(600px, 100%);
+  padding: 20px 28px;
+  border: none;
+  border-radius: 16px;
+  background: #2563eb;
+  color: #fff;
+  font: inherit;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.counter-button:hover:not(:disabled) { background: #1d4ed8; }
+.counter-button:disabled { opacity: 0.6; cursor: wait; }
+.counter-message { margin: 0; color: #475569; font-style: italic; }
 .ticket {
   background: #fff;
   border: 3px dashed #94a3b8;
