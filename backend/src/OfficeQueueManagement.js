@@ -111,6 +111,9 @@ class OfficeQueueManagement {
         const ticket = selectedQueue.dequeue();
 
         if (ticket) {
+            // Mark the ticket as called and set counterId
+            ticket.markAsCalled(counterId);
+
             // Mark the ticket as served
             ticket.markAsServed();
     
