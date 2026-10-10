@@ -14,7 +14,10 @@ export const getCounter = (officeQueueManagement) => (req, res) => {
     const services = [...counter.serviceIds]
       .map((serviceId) => officeQueueManagement.services.get(serviceId))
       .filter(Boolean)
-      .map((service) => service.getInfo());
+      .map((service) => ({
+        ...service.getInfo(),
+        waitingTickets: officeQueueManagement.queues.get(service.id)?.length ?? 0
+      }));
 
     return res.status(200).json({
       id: counter.id,
