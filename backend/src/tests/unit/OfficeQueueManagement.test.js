@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import OfficeQueueManagement from '../../OfficeQueueManagement.js';
+import Counter from '../../models/Counter.js';
 import Service from '../../models/Service.js';
 import ServiceQueue from '../../models/ServiceQueue.js';
 import Ticket from '../../models/Ticket.js';
@@ -112,6 +113,72 @@ describe('OfficeQueueManagement', () => {
 
       expect(oqm.tickets.get(ticket.code)).toBe(ticket);
       expect(oqm.tickets.size).toBe(1);
+    });
+  });
+
+  describe('callNextCustomer', () => {
+    beforeEach(() => {
+      oqm.services.set('S1', new Service('S1', 'Shipping', 5));
+      oqm.services.set('S2', new Service('S2', 'Accounts', 8));
+
+      oqm.queues.set('S1', new ServiceQueue('S1'));
+      oqm.queues.set('S2', new ServiceQueue('S2'));
+
+      oqm.counters.set('C1', new Counter('C1', 1));
+      oqm.counters.set('C2', new Counter('C2', 2));
+
+      oqm.counters.get('C1').addService('S1');
+      oqm.counters.get('C1').addService('S2');
+      oqm.counters.get('C2').addService('S1');
+    });
+
+    it('throws when the counter does not exist', () => {
+      expect(() => oqm.callNextCustomer('unknown')).toThrow(/not found/);
+    });
+
+    it('returns null when all queues are empty', () => {
+      const result = oqm.callNextCustomer('C1');
+      expect(result).toBeNull();
+    });
+
+    it('marks the ticket as CALLED and assigns it to the counter', () => {
+      const ticket = oqm.selectService('S1');
+
+      const result = oqm.callNextCustomer('C1');
+
+      expect(result).toBe(ticket);
+      expect(ticket.status).toBe(TicketStatus.CALLED);
+      expect(ticket.counterId).toBe('C1');
+    });
+
+    it('removes the ticket from the queue after serving', () => {
+      const ticket = oqm.selectService('S1');
+
+      const result = oqm.callNextCustomer('C1');
+
+      expect(result).toBe(ticket);
+      const queue = oqm.queues.get('S1');
+      expect(queue.length).toBe(0);
+    });
+
+    it('returns the next ticket from the longest queue that the counter can serve', () => {
+      const ticket1 = oqm.selectService('S1');
+      
+      oqm.selectService('S1');
+      oqm.selectService('S2');
+
+      const result = oqm.callNextCustomer('C1');
+
+      expect(result).toBe(ticket1);
+    });
+
+    it('returns the next ticket with the shortest estimated service time when multiple queues have the same length', () => {
+      oqm.selectService('S1');
+      oqm.selectService('S2');
+
+      const result = oqm.callNextCustomer('C1');
+
+      expect(result.serviceId).toBe('S1');
     });
   });
 });
