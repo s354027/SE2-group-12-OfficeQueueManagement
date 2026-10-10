@@ -13,8 +13,8 @@ describe("CounterUI", () => {
     const counterData = {
       number: 1,
       services: [
-        { id: "S1", tagName: "Shipping" },
-        { id: "S2", tagName: "Accounts" },
+        { id: "S1", tagName: "Shipping", waitingTickets: 3 },
+        { id: "S2", tagName: "Accounts", waitingTickets: 1 },
       ],
     };
     vi.spyOn(api, "getCounter").mockResolvedValue(counterData);
@@ -22,9 +22,7 @@ describe("CounterUI", () => {
     render(<CounterUI />);
 
     expect(await screen.findByText("Counter Desk #1")).toBeInTheDocument();
-    expect(
-      screen.getByText("Services: Shipping, Accounts"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Shipping: 3, Accounts: 1")).toBeInTheDocument();
   });
 
   it('shows "No customers currently being served" when loaded', async () => {
@@ -94,8 +92,8 @@ describe("CounterUI", () => {
     const counterData = {
       number: 1,
       services: [
-        { id: "S1", tagName: "Shipping" },
-        { id: "S2", tagName: "Accounts" },
+        { id: "S1", tagName: "Shipping", waitingTickets: 1 },
+        { id: "S2", tagName: "Accounts", waitingTickets: 2 },
       ],
     };
     const ticketData = {
@@ -113,7 +111,7 @@ describe("CounterUI", () => {
     await userEvent.click(button);
 
     await waitFor(() => {
-      expect(screen.getByText("Service: Shipping")).toBeInTheDocument();
+      expect(screen.getByText("Shipping: 0, Accounts: 2")).toBeInTheDocument();
     });
   });
 

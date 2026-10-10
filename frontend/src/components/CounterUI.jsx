@@ -1,37 +1,84 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { callNextCustomer, getCounter } from '../api.js';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { callNextCustomer, getCounter } from "../api.js";
 
 export default function CounterUI() {
   const { counterId } = useParams();
   const [currentTicket, setCurrentTicket] = useState(null);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [counter, setCounter] = useState(null);
-  const [counterError, setCounterError] = useState('');
+  const [counterError, setCounterError] = useState("");
 
   useEffect(() => {
-    getCounter(counterId)
-      .then(setCounter)
-      .catch((error) => setCounterError(error.message));
+    const loadCounter = async () => {
+      try {
+        const data = await getCounter(counterId);
+        
+        if (data) {
+          setCounter(data);
+          setCounterError("");
+        } else {
+          return;
+        }
+
+        const hasWaitingTickets = data.services.some(
+          (service) => service.waitingTickets > 0,
+        );
+        if (hasWaitingTickets) {
+          setMessage((currentMessage) =>
+            currentMessage === "No customers waiting for this counter"
+              ? ""
+              : currentMessage,
+          );
+        }
+      } catch (error) {
+        setCounterError(error.message);
+        setCounter(null);
+      }
+    };
+
+    loadCounter();
+    const refreshInterval = setInterval(loadCounter, 1000);
+
+    return () => {
+      clearInterval(refreshInterval);
+    };
   }, [counterId]);
 
   const handleCallNext = async () => {
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
       const data = await callNextCustomer(counterId);
 
       if (data.ticket) {
         setCurrentTicket(data.ticket);
+        setCounter(
+          (currentCounter) =>
+            currentCounter && {
+              ...currentCounter,
+              services: currentCounter.services.map((service) =>
+                service.id === data.ticket.serviceId
+                  ? {
+                      ...service,
+                      waitingTickets: Math.max(
+                        0,
+                        (service.waitingTickets ?? 0) - 1,
+                      ),
+                    }
+                  : service,
+              ),
+            },
+        );
         setMessage(data.message);
       } else {
         setCurrentTicket(null);
-        setMessage(data.message); // For example: "No customers waiting for this counter"
+        setMessage(data.message);
       }
     } catch (err) {
-      console.error('API error:', err);
+      console.error("API error:", err);
       setMessage(err.message);
     } finally {
       setLoading(false);
@@ -40,14 +87,26 @@ export default function CounterUI() {
 
   return (
     <main className="screen counter-screen">
+      {counterError && (
+        <p className="counter-error" role="alert">
+          {counterError}
+        </p>
+      )}
+
       <h1>Counter Desk #{counter?.number ?? counterId}</h1>
 
       {counter && (
-        <p className="counter-services">
-          Services: {counter.services.map((service) => service.tagName).join(', ')}
-        </p>
+        <div className="counter-services">
+          <p>
+            {counter.services
+              .map(
+                (service) =>
+                  `${service.tagName}: ${service.waitingTickets ?? 0}`,
+              )
+              .join(", ")}
+          </p>
+        </div>
       )}
-      {counterError && <p className="counter-error" role="alert">{counterError}</p>}
 
       <section className="counter-panel" aria-live="polite">
         <h2>Current Customer:</h2>
@@ -55,8 +114,9 @@ export default function CounterUI() {
           <div className="counter-ticket">
             Ticket #{currentTicket.code}
             <div className="counter-service">
-              Service: {counter?.services.find((service) => service.id === currentTicket.serviceId)?.tagName
-                ?? currentTicket.serviceId}
+              {counter?.services.find(
+                (service) => service.id === currentTicket.serviceId,
+              )?.tagName ?? currentTicket.serviceId}
             </div>
           </div>
         ) : (
@@ -69,10 +129,14 @@ export default function CounterUI() {
         onClick={handleCallNext}
         disabled={loading}
       >
-        {loading ? 'Calling next customer...' : 'Call Next Customer'}
+        {loading ? "Calling next customer..." : "Call Next Customer"}
       </button>
 
-      {message && <p className="counter-message" role="status">{message}</p>}
+      {message && (
+        <p className="counter-message" role="status">
+          {message}
+        </p>
+      )}
     </main>
   );
 }
