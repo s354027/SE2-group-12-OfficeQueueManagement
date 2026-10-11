@@ -57,7 +57,7 @@ h1 { font-size: 3rem; margin: 0; }
   box-shadow: 0 12px 30px rgb(15 23 42 / 8%);
 }
 .counter-panel h2 { margin: 0 0 20px; font-size: 1.4rem; color: #475569; }
-.counter-ticket { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 700; color: #2563eb; }
+.counter-ticket { font-size: clamp(2.5rem, 8vw, 3.5rem); font-weight: 700; color: #2563eb; }
 .counter-service { margin-top: 8px; font-size: 1.2rem; font-weight: 400; color: #475569; }
 .counter-empty { margin: 0; font-size: 1.3rem; color: #64748b; }
 .counter-button {
