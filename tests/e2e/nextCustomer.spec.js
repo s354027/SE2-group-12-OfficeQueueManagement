@@ -99,6 +99,28 @@ test.describe("Next Customer Feature", () => {
   test("should display a message when there are no waiting customers", async ({
     page,
   }) => {
+    // Fetch counter data to ensure there are no waiting customers
+    const counterResponse = await page.request.get(
+      `${BASE_URL}/api/counters/C${COUNTER_ID}`,
+    );
+    await expect(counterResponse).toBeOK();
+
+    // Wait until there are no waiting tickets for any service
+    let counterData = await counterResponse.json();
+
+    while (counterData.services.some((service) => service.waitingTickets > 0)) {
+      const nextCustomerResponse = await page.request.post(
+        `${BASE_URL}/api/counters/C${COUNTER_ID}/next-customer`,
+      );
+      await expect(nextCustomerResponse).toBeOK();
+
+      const refreshedCounterResponse = await page.request.get(
+        `${BASE_URL}/api/counters/C${COUNTER_ID}`,
+      );
+      await expect(refreshedCounterResponse).toBeOK();
+      counterData = await refreshedCounterResponse.json();
+    }
+
     // Click the "Next Customer" button when there are no waiting customers
     const nextCustomerButton = page.locator("button", {
       hasText: "Next Customer",
