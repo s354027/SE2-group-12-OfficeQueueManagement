@@ -39,7 +39,7 @@ function buildOffice() {
 }
 
 describe('GET /api/counters/:counterId', () => {
-  it('returns the counter id, number and the services it supports', async () => {
+  it('returns the counter id, number and the services it supports, with their waiting count', async () => {
     const app = createApp(buildOffice());
 
     const res = await request(app).get('/api/counters/C1');
@@ -49,11 +49,23 @@ describe('GET /api/counters/:counterId', () => {
     expect(res.body.number).toBe(1);
     expect(res.body.services).toEqual(
       expect.arrayContaining([
-        { id: 'S1', tagName: 'Shipping', estimatedServiceTimeMinutes: 5 },
-        { id: 'S3', tagName: 'Info', estimatedServiceTimeMinutes: 3 },
+        { id: 'S1', tagName: 'Shipping', estimatedServiceTimeMinutes: 5, waitingTickets: 0 },
+        { id: 'S3', tagName: 'Info', estimatedServiceTimeMinutes: 3, waitingTickets: 0 },
       ])
     );
     expect(res.body.services).toHaveLength(2);
+  });
+
+  it('reports the current queue length for each service as waitingTickets', async () => {
+    const oqm = buildOffice();
+    const app = createApp(oqm);
+    await request(app).post('/api/tickets').send({ serviceId: 'S1' });
+    await request(app).post('/api/tickets').send({ serviceId: 'S1' });
+
+    const res = await request(app).get('/api/counters/C1');
+
+    const shipping = res.body.services.find((service) => service.id === 'S1');
+    expect(shipping.waitingTickets).toBe(2);
   });
 
   it('returns 404 for a counter that does not exist', async () => {
