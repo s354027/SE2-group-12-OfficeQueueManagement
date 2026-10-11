@@ -5,11 +5,11 @@ class Counter {
     officerId;
     currentTicketCode; // the ticket that is currently being served
 
-    constructor(id, number, officerId) {
+    constructor(id, number, officerId=null) {
         this.id = id;
         this.number = number;
         this.serviceIds = new Set();
-        this.officerId = null;
+        this.officerId = officerId;
         this.currentTicketCode = null;
     }
 

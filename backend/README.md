@@ -120,7 +120,8 @@ Current roles:
     {
       "id": "S1",
       "tagName": "Shipping",
-      "estimatedServiceTimeMinutes": 5
+      "estimatedServiceTimeMinutes": 5,
+      "waitingTickets": 3,
     }
   ]
 }
