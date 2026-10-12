@@ -120,7 +120,7 @@ export default function CounterUI() {
             </div>
           </div>
         ) : (
-          <p className="counter-empty">No customer is waiting!</p>
+          <p className="counter-empty">No customer is waiting for this counter!</p>
         )}
       </section>
 
