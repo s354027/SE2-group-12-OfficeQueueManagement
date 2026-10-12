@@ -112,7 +112,7 @@ export default function CounterUI() {
         <h2>Current Customer:</h2>
         {currentTicket ? (
           <div className="counter-ticket">
-            Ticket #{currentTicket.code}
+            {currentTicket.serviceId}-{currentTicket.code}
             <div className="counter-service">
               {counter?.services.find(
                 (service) => service.id === currentTicket.serviceId,
@@ -120,7 +120,7 @@ export default function CounterUI() {
             </div>
           </div>
         ) : (
-          <p className="counter-empty">No customer currently being served</p>
+          <p className="counter-empty">No customer is waiting!</p>
         )}
       </section>
 

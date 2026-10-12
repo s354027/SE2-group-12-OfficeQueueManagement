@@ -11,7 +11,7 @@ export default function TicketDisplay({ ticket, serviceName, onDone }) {
       onDone();
       return;
     }
-    const t = setTimeout(() => setSeconds((s) => s - 1), 500);
+    const t = setTimeout(() => setSeconds((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [seconds, onDone]);
 
@@ -22,7 +22,7 @@ export default function TicketDisplay({ ticket, serviceName, onDone }) {
     <main className="screen">
       <h1>Your ticket</h1>
       <div className="ticket">
-        <div className="ticket-code">{ticket.code}</div>
+        <div className="ticket-code">{ticket.serviceId}-{ticket.code}</div>
         <div className="ticket-service">{serviceName}</div>
         {typeof ahead === 'number' && (
           <div className="ticket-ahead">
