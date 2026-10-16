@@ -13,10 +13,13 @@ const SERVICES = [
   { id: 'S3', tagName: 'Info' },
 ];
 
-// Reads the numeric code shown on the ticket screen.
+// Reads the formatted code shown on the ticket screen (e.g. "S1-1") and extracts the numeric code.
 async function readTicketCode(page) {
   const text = await page.locator('.ticket-code').innerText();
-  return Number(text.trim());
+  // Splits "S1-1" or "S2-12" by "-" and takes the numeric part after the hyphen
+  const parts = text.trim().split('-');
+  const numericPart = parts.length > 1 ? parts[1] : parts[0];
+  return Number(numericPart);
 }
 
 test.describe('Get ticket - totem home page', () => {
@@ -58,7 +61,10 @@ test.describe('Get ticket - selecting a service', () => {
         page.getByText('Please wait for your number to be called.')
       ).toBeVisible();
 
-      // The code is a positive integer
+      // Checks that the displayed ticket code starts with the service ID (e.g. "S1-")
+      await expect(page.locator('.ticket-code')).toHaveText(new RegExp(`^${id}-\\d+$`));
+
+      // The extracted numeric code is a positive integer
       const code = await readTicketCode(page);
       expect(Number.isInteger(code)).toBe(true);
       expect(code).toBeGreaterThan(0);
@@ -85,8 +91,8 @@ test.describe('Get ticket - selecting a service', () => {
     const body = await response.json();
     expect(body).toMatchObject({ serviceId: 'S2', status: 'WAITING', counterId: null });
 
-    // The code in the UI is the one returned by the backend
-    await expect(page.locator('.ticket-code')).toHaveText(String(body.code));
+    // The code in the UI is formatted as "serviceId-code" matching the backend response
+    await expect(page.locator('.ticket-code')).toHaveText(`S2-${body.code}`);
   });
 
   test('the backend does not send "people ahead", so the UI does not show it', async ({ page }) => {
@@ -199,7 +205,7 @@ test.describe('Get ticket - return to the start screen', () => {
     await page.getByRole('button', { name: 'Shipping', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Your ticket' })).toBeVisible();
 
-    // TicketDisplay counts down 10 steps of 500 ms (about 5 seconds).
+    // TicketDisplay counts down 10 steps of 1000 ms (10 seconds).
     await expect(page.getByRole('heading', { name: 'Take a ticket' })).toBeVisible({
       timeout: 15_000,
     });
