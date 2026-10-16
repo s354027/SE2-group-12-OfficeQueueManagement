@@ -1,0 +1,12 @@
+{
+  "name": "office-queue-management",
+  "private": true,
+  "version": "1.0.0",
+  "description": "End-to-end test orchestration for the Office Queue Management system",
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
